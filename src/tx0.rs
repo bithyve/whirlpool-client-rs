@@ -338,7 +338,7 @@ pub struct InputStructure {
     pub n_p2wpkh_inputs: usize,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Tx0Data {
     pub pool_id: String,
@@ -395,7 +395,7 @@ impl Tx0Data {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum Tx0PushResponse {
     Ok {

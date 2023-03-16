@@ -18,10 +18,10 @@
 //! for mix coordination.
 
 use crate::{endpoints::Endpoints, http, mix::AlternateIdentityRequest};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// Response payload returned by alternate identity (output related) endpoints.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum AltIdResponse {
     Error { message: String },

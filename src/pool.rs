@@ -13,12 +13,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-use serde::{self, Deserialize};
+use serde::{self, Serialize, Deserialize};
 
 use crate::{endpoints::Endpoints, http};
 
 /// Information about a particular pool as returned by the coordinator.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Pool {
     #[serde(rename = "poolId")]
@@ -49,7 +49,7 @@ impl From<PoolsResponse> for Vec<Pool> {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum MixStatus {
     ConfirmInput,
