@@ -348,7 +348,8 @@ pub struct Tx0Data {
     pub fee_discount_percent: u8,
     pub message: Option<String>,
     pub fee_payload_64: String,
-    // pub fee_address: Option<Address>,
+    #[serde(skip_serializing)]
+    pub fee_address: Option<Address>,
     pub fee_output_signature: String,
 }
 
