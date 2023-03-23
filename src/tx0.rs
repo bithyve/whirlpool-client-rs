@@ -332,6 +332,8 @@ impl CoordinatorFee {
 }
 
 /// Used during TX0 fee computation. Needed because different script types have different lengths.
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct InputStructure {
     pub n_p2pkh_inputs: usize,
     pub n_p2sh_p2wpkh_inputs: usize,
