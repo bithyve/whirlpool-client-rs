@@ -46,13 +46,14 @@ impl PremixValue {
 
 /// Contains the preview of how a TX0 will look.
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 #[cfg_attr(test, derive(PartialEq))]
 pub struct Preview {
-    premix_value: u64,
-    n_premix_outputs: u16,
-    miner_fee: u64,
-    coordinator_fee: CoordinatorFee,
-    change: u64,
+    pub premix_value: u64,
+    pub n_premix_outputs: u16,
+    pub miner_fee: u64,
+    pub coordinator_fee: CoordinatorFee,
+    pub change: u64,
 }
 
 impl Preview {
@@ -316,6 +317,7 @@ fn mask_fee_payload(
 
 /// Coordinator fee. That can be either a real fee to the coordinator or a refund to self.
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 #[cfg_attr(test, derive(Clone, PartialEq))]
 pub enum CoordinatorFee {
     DepositBack(u64),

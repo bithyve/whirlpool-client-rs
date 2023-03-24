@@ -1,6 +1,6 @@
 [package]
 name = "whirlpool-client"
-version = "1.0.6"
+version = "1.0.7"
 authors = ["Straylight <straylight_orbit@protonmail.com>"]
 description = "Whirlpool Coinjoin Client"
 license = "GPL-3.0-only"
