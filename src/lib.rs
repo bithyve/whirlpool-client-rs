@@ -30,7 +30,7 @@ const WP_VERSION: &str = "0.23";
 const UA_HTTP: &str = "whirlpool-client/0.23";
 
 /// Contains information about an own input for transaction building and signing purposes.
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Input {
     /// Outpoint used by this input.
     pub outpoint: bitcoin::OutPoint,
@@ -41,7 +41,7 @@ pub struct Input {
 }
 
 /// Contains information about an own output for transaction building and signing purposes.
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct OutputTemplate {
     /// Address that this output is sending to.
     pub address: bitcoin::Address,
@@ -68,6 +68,7 @@ pub trait Signer: std::fmt::Debug + Send {
 #[cfg(feature = "client")]
 pub use client::{start, start_blocking, Info, TorConfig, API};
 pub use mix::{Event, Params};
+use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "client")]
 pub mod client {
