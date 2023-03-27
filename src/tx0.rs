@@ -812,7 +812,7 @@ mod test {
         assert_eq!(inputs_value - total_out, miner_fee);
     }
 
-    fn fake_input(outpoint: &str, value: u64) -> Input {
+    pub fn fake_input(outpoint: &str, value: u64) -> Input {
         // this wouldn't make any sense in reality, but we just want to check
         // that our PSBT is constructed properly
         let outpoint = OutPoint::from_str(outpoint).unwrap();
