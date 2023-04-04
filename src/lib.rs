@@ -236,9 +236,9 @@ pub mod client {
     ) -> Result<bitcoin::Txid, Error> {
         log::info!("*** if you find this project useful, please consider donating: bc1qdqyddz0fh8d24gkwhuu5apcf8uzk4nyxw2035a ***");
 
-        if !port_check::is_port_reachable((tor_config.host, tor_config.port)) {
-            return Err(Error::TorMissing);
-        }
+        // if !port_check::is_port_reachable((tor_config.host, tor_config.port)) {
+        //     return Err(Error::TorMissing);
+        // }
 
         let alt_client = build_http_agent(tor_config);
         let endpoints = select_endpoints(tor_config.exit_into_clearnet, params.network);
