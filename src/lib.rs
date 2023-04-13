@@ -55,6 +55,7 @@ pub trait Signer: std::fmt::Debug + Send {
     fn sign_tx(
         &mut self,
         tx: psbt::PartiallySignedTransaction,
+        input_index: usize,
     ) -> Result<bitcoin::Transaction, Box<dyn std::error::Error + Send + Sync>>;
 
     /// Signs a message for an input.

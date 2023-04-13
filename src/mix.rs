@@ -239,7 +239,7 @@ impl Mix {
 
                     psbt.outputs[our_out_idx] = self.params.destination.fields.clone();
 
-                    let mut signed = self.params.signer.sign_tx(psbt).map_err(Error::Signing)?;
+                    let mut signed = self.params.signer.sign_tx(psbt, our_in_idx).map_err(Error::Signing)?;
                     let witness = std::mem::take(&mut signed.input[our_in_idx].witness);
 
                     if witness.is_empty() {
@@ -646,6 +646,7 @@ mod test {
         fn sign_tx(
             &mut self,
             mut tx: psbt::PartiallySignedTransaction,
+            our_in_idx: usize,
         ) -> Result<bitcoin::Transaction, Box<dyn std::error::Error + Send + Sync>> {
             for input in &mut tx.inputs {
                 if input.witness_utxo.is_some() {
