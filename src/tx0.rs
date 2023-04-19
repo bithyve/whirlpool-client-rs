@@ -353,7 +353,7 @@ pub struct Tx0Data {
     pub message: Option<String>,
     pub fee_payload_64: String,
     pub fee_address: Option<Address>,
-    pub fee_output_signature: String,
+    pub fee_output_signature: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -673,7 +673,7 @@ mod test {
             fee_payment_code: "PM8TJXp19gCE6hQzqRi719FGJzF6AreRwvoQKLRnQ7dpgaakakFns22jHUqhtPQWmfevPQRCyfFbdDrKvrfw9oZv5PjaCerQMa3BKkPyUf9yN1CDR3w6".to_string(),
             pool_id: String::new(),
             message: None,
-            fee_output_signature: "II4wrLMNJxchyrcu0aVB8FbrCFIO6YSKpZW5qfc1DO7NCkl4hihArn3aLcP0ylN5Z/UDbxWwzd4l9huO1hcsK/E=".to_string(),
+            fee_output_signature: Some("II4wrLMNJxchyrcu0aVB8FbrCFIO6YSKpZW5qfc1DO7NCkl4hihArn3aLcP0ylN5Z/UDbxWwzd4l9huO1hcsK/E=".to_string()),
         };
 
         let premix_value = 1_000_170;
