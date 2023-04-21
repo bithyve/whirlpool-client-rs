@@ -246,7 +246,9 @@ pub mod client {
         let (primary_username, primary_password) = isolation_tokens();
         let proxy_addr = SocketAddrV4::new(tor_config.host, tor_config.port);
         log::info!("@Praneeth: primary_username {}, primary_password {}", primary_username, primary_password);
+        println!("@Praneeth: primary_username {}, primary_password {}", primary_username, primary_password);
         log::info!("@Praneeth: proxy_addr {:?}", proxy_addr);
+        println!("@Praneeth: proxy_addr {:?}", proxy_addr);
 
         let socks_stream = socks::Socks5Stream::connect_with_password(
             proxy_addr,
@@ -262,10 +264,12 @@ pub mod client {
             .map_err(|_| NetworkError::CannotSetReadTimeout)?;
 
         log::info!("@Praneeth: socks_stream {:?}", socks_stream);  
+        println!("@Praneeth: socks_stream {:?}", socks_stream);  
         let (mut ws, _) = tungstenite::client_tls(&endpoints.ws_connect, socks_stream)
             .map_err(|_| NetworkError::WsHandshake)?;
 
         log::info!("@Praneeth: ws {:?}", ws);  
+        println!("@Praneeth: ws {:?}", ws);  
 
         let (mut mix, connect_request) = mix::Mix::new(params);
 
