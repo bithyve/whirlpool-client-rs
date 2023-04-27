@@ -123,9 +123,9 @@ pub mod client {
         /// Creates a new API instance with its own isolation tokens. Returns `None` if Tor is not
         /// locally running and available.
         pub fn new(tor_config: TorConfig, network: Network) -> Option<API> {
-            if true {
+            if port_check::is_port_reachable((tor_config.host, tor_config.port)) {
                 let agent = build_http_agent(tor_config);
-                let endpoints = select_endpoints(true, network);
+                let endpoints = select_endpoints(tor_config.exit_into_clearnet, network);
                 Some(Self { agent, endpoints })
             } else {
                 None
@@ -193,6 +193,7 @@ pub mod client {
         .expect("format proxy URL properly");
 
         let agent = ureq::builder()
+            .proxy(proxy)
             .user_agent(UA_HTTP)
             .timeout_connect(request_timeout)
             .build();
