@@ -237,18 +237,14 @@ pub mod client {
     ) -> Result<bitcoin::Txid, Error> {
         log::info!("*** if you find this project useful, please consider donating: bc1qdqyddz0fh8d24gkwhuu5apcf8uzk4nyxw2035a ***");
 
-        // if !port_check::is_port_reachable((tor_config.host, tor_config.port)) {
-        //     return Err(Error::TorMissing);
-        // }
+        if !port_check::is_port_reachable((tor_config.host, tor_config.port)) {
+            return Err(Error::TorMissing);
+        }
 
         let alt_client = build_http_agent(tor_config);
         let endpoints = select_endpoints(tor_config.exit_into_clearnet, params.network);
         let (primary_username, primary_password) = isolation_tokens();
         let proxy_addr = SocketAddrV4::new(tor_config.host, tor_config.port);
-        log::info!("@Praneeth: primary_username {}, primary_password {}", primary_username, primary_password);
-        println!("@Praneeth: primary_username {}, primary_password {}", primary_username, primary_password);
-        log::info!("@Praneeth: proxy_addr {:?}", proxy_addr);
-        println!("@Praneeth: proxy_addr {:?}", proxy_addr);
 
         let socks_stream = socks::Socks5Stream::connect_with_password(
             proxy_addr,
@@ -263,13 +259,9 @@ pub mod client {
             .set_read_timeout(Some(Duration::from_secs(300)))
             .map_err(|_| NetworkError::CannotSetReadTimeout)?;
 
-        log::info!("@Praneeth: socks_stream {:?}", socks_stream);  
-        println!("@Praneeth: socks_stream {:?}", socks_stream);  
         let (mut ws, _) = tungstenite::client_tls(&endpoints.ws_connect, socks_stream)
             .map_err(|_| NetworkError::WsHandshake)?;
 
-        log::info!("@Praneeth: ws {:?}", ws);  
-        println!("@Praneeth: ws {:?}", ws);  
 
         let (mut mix, connect_request) = mix::Mix::new(params);
 
