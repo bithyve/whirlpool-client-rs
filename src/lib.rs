@@ -219,9 +219,9 @@ pub mod client {
     pub fn start<F: Fn(Info) + Send + 'static>(
         params: mix::Params,
         tor_config: TorConfig,
-        notify: F,
+        mut notify: F,
     ) -> thread::JoinHandle<Result<bitcoin::Txid, Error>> {
-        thread::spawn(move || start_blocking(params, tor_config, notify))
+        thread::spawn(move || start_blocking(params, tor_config, &mut notify))
     }
 
     /// Starts a new Whirlpool mix in the current thread in a blocking manner. The `notify` parameter function
@@ -231,10 +231,10 @@ pub mod client {
     /// other participants, in which case `Error::MixFailed` is returned. That variant does not indicate a problem
     /// and such a mix can be restarted. Other error variants imply networking issues or a programming error
     /// on either side.
-    pub fn start_blocking<F: Fn(Info)>(
+    pub fn start_blocking<F: FnMut(Info)>(
         params: mix::Params,
         tor_config: TorConfig,
-        notify: F,
+        notify: &mut F,
     ) -> Result<bitcoin::Txid, Error> {
         log::info!("*** if you find this project useful, please consider donating: bc1qdqyddz0fh8d24gkwhuu5apcf8uzk4nyxw2035a ***");
 
