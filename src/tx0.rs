@@ -379,7 +379,7 @@ impl Tx0Data {
 
         let request = RequestPayload {
             scode,
-            partner_id: std::option_env!("WPID").unwrap_or("FREESIDE"),
+            partner_id: std::option_env!("WPID").unwrap_or("WHIRLPOOL_HEXA"),
         };
 
         http::Request {
