@@ -122,13 +122,18 @@ pub mod client {
     impl API {
         /// Creates a new API instance with its own isolation tokens. Returns `None` if Tor is not
         /// locally running and available.
-        pub fn new(tor_config: TorConfig, network: Network) -> Option<API> {
-            if true {
-                let agent = build_http_agent(tor_config);
-                let endpoints = select_endpoints(tor_config.exit_into_clearnet, network);
-                Some(Self { agent, endpoints })
-            } else {
-                None
+        pub fn new(tor_config: Option<TorConfig>, network: Network) -> Option<API> {
+            match tor_config {
+                Some(tor_config) => {
+                    let agent = build_http_agent(Some(tor_config));
+                    let endpoints = select_endpoints(tor_config.exit_into_clearnet, network);
+                    Some(Self { agent, endpoints })
+                }
+                None => {
+                    let agent = build_http_agent(None);
+                    let endpoints = select_endpoints(true, network);
+                    Some(Self { agent, endpoints })
+                },
             }
         }
 
@@ -177,28 +182,40 @@ pub mod client {
     }
 
     /// Builds a new HTTP agent with new isolation tokens.
-    fn build_http_agent(tor_config: TorConfig) -> ureq::Agent {
-        let TorConfig {
-            host: proxy_host,
-            port: proxy_port,
-            request_timeout,
-            ..
-        } = tor_config;
-
-        let (username, password) = isolation_tokens();
-
-        let proxy = ureq::Proxy::new(format!(
-            "socks5://{username}:{password}@{proxy_host}:{proxy_port}"
-        ))
-        .expect("format proxy URL properly");
-
-        let agent = ureq::builder()
-            .proxy(proxy)
-            .user_agent(UA_HTTP)
-            .timeout_connect(request_timeout)
-            .build();
-
-        agent
+    fn build_http_agent(tor_config: Option<TorConfig>) -> ureq::Agent {
+        match tor_config {
+            Some(tor_config) => {
+                let TorConfig {
+                    host: proxy_host,
+                    port: proxy_port,
+                    request_timeout,
+                    ..
+                } = tor_config;
+        
+                let (username, password) = isolation_tokens();
+        
+                let proxy = ureq::Proxy::new(format!(
+                    "socks5://{username}:{password}@{proxy_host}:{proxy_port}"
+                ))
+                .expect("format proxy URL properly");
+        
+                let agent = ureq::builder()
+                    .proxy(proxy)
+                    .user_agent(UA_HTTP)
+                    .timeout_connect(request_timeout)
+                    .build();
+        
+                agent
+            }
+            None => {
+                let agent = ureq::builder()
+                    .user_agent(UA_HTTP)
+                    .build();
+        
+                agent
+            }
+        }
+        
     }
 
     /// Selects endpoints based on routing preference and Bitcoin network.
@@ -242,7 +259,7 @@ pub mod client {
         //     return Err(Error::TorMissing);
         // }
 
-        let alt_client = build_http_agent(tor_config);
+        let alt_client = build_http_agent(Some(tor_config));
         let endpoints = select_endpoints(tor_config.exit_into_clearnet, params.network);
         let (primary_username, primary_password) = isolation_tokens();
         let proxy_addr = SocketAddrV4::new(tor_config.host, tor_config.port);
