@@ -235,7 +235,7 @@ pub mod client {
     /// on either side.
     pub fn start<F: Fn(Info) + Send + 'static>(
         params: mix::Params,
-        tor_config: TorConfig,
+        tor_config: Option<TorConfig>,
         mut notify: F,
     ) -> thread::JoinHandle<Result<bitcoin::Txid, Error>> {
         thread::spawn(move || start_blocking(params, tor_config, &mut notify))
@@ -250,36 +250,53 @@ pub mod client {
     /// on either side.
     pub fn start_blocking<F: FnMut(Info)>(
         params: mix::Params,
-        tor_config: TorConfig,
+        tor_config: Option<TorConfig>,
         notify: &mut F,
     ) -> Result<bitcoin::Txid, Error> {
         log::info!("*** if you find this project useful, please consider donating: bc1qdqyddz0fh8d24gkwhuu5apcf8uzk4nyxw2035a ***");
 
-        // if !port_check::is_port_reachable((tor_config.host, tor_config.port)) {
-        //     return Err(Error::TorMissing);
-        // }
+        let alt_client = match tor_config {
+            Some(tor_config) => {
+                build_http_agent(Some(tor_config))
+            }
+            None => {
+                build_http_agent(None)
+            }
+        };
 
-        let alt_client = build_http_agent(Some(tor_config));
-        let endpoints = select_endpoints(tor_config.exit_into_clearnet, params.network);
-        let (primary_username, primary_password) = isolation_tokens();
-        let proxy_addr = SocketAddrV4::new(tor_config.host, tor_config.port);
+        let endpoints = match tor_config {
+            Some(tor_config) => {
+                select_endpoints(tor_config.exit_into_clearnet, params.network)
+            }
+            None => {
+                select_endpoints(true, params.network)
+            }
+        };
 
-        let socks_stream = socks::Socks5Stream::connect_with_password(
-            proxy_addr,
-            endpoints.server,
-            &primary_username,
-            &primary_password,
-        )
-        .map_err(NetworkError::Socks)?
-        .into_inner();
+        let (mut ws, _) = match tor_config {
+            Some(tor_config) => {
+                let (primary_username, primary_password) = isolation_tokens();
+                let proxy_addr = SocketAddrV4::new(tor_config.host, tor_config.port);
+                let socks_stream = socks::Socks5Stream::connect_with_password(
+                        proxy_addr,
+                        endpoints.server,
+                        &primary_username,
+                        &primary_password,
+                    )
+                    .map_err(NetworkError::Socks)?
+                    .into_inner();
 
-        socks_stream
-            .set_read_timeout(Some(Duration::from_secs(300)))
-            .map_err(|_| NetworkError::CannotSetReadTimeout)?;
-
-        let (mut ws, _) = tungstenite::client_tls(&endpoints.ws_connect, socks_stream)
-            .map_err(|_| NetworkError::WsHandshake)?;
-
+                socks_stream
+                    .set_read_timeout(Some(Duration::from_secs(300)))
+                    .map_err(|_| NetworkError::CannotSetReadTimeout)?;
+                tungstenite::client_tls(&endpoints.ws_connect, socks_stream)
+                    .map_err(|_| NetworkError::WsHandshake)?
+            }
+            None => {
+                tungstenite::connect(&endpoints.ws_connect)
+                    .map_err(|_| NetworkError::WsHandshake)?
+            }
+        };
 
         let (mut mix, connect_request) = mix::Mix::new(params);
 
