@@ -21,5 +21,5 @@ serde_json = "1.0"
 port_check = { version = "0.1.5", optional = true }
 rand = { version = "0.8", optional = true }
 socks = { version = "0.3", optional = true }
-tungstenite = {version = "0.17", features = ["rustls-tls-native-roots"], optional = true }
+tungstenite = {version = "0.17", features = ["rustls-tls-webpki-roots"], optional = true }
 ureq = { version = "2.4", features = ["socks-proxy"] , optional = true }
